@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./deepfake_detection/backend/deepfake-master
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    volumes:
+      - ./deepfake_detection/backend/deepfake-master/model:/app/model
+      - ./deepfake_detection/backend/deepfake-master/static:/app/static
+    command: python app.py
+
+  frontend:
+    build:
+      context: ./deepfake_detection/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:5000
+    depends_on:
+      - backend
+    command: npm run dev
